@@ -1,4 +1,4 @@
-const formFind = codument.querySelector('[data-form-find]');
+const formFind = document.querySelector('[data-form-find]');
 const formUser = document.querySelector('[data-form-user]');
 const avatarInput = document.querySelector('[data-avatar]');
 const uploadButton = document.querySelector('[data-upload]');
@@ -8,12 +8,50 @@ const handleFindSubmit = (e) => {
     e.preventDefault();
     const data = getFormData(formFind);
     const id = data.get('id');
-    const url = apiuser(id);
+    const url = apiUser(id);
 
     axios.get(url).then(printResponse).then(populate);
 }
 
+const handleUserSubmit = (e) => {
+    e.preventDefault();
+    const data = getFormData(formUser);
+    const id = data.get('id');
+    const url = apiUser(id, 'upload');
+
+    const options ={
+        url,
+        method: 'PATCH',
+        headers: {
+            'content-Type': 'multipart/form-data',
+        },
+
+        onUploadProgress: function (progressEvent){
+            progressEvent.total 
+            progressEvent.loaded
+
+            const percentage = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            progressBar.style.width = `${percentage}%`;
+            progressBar.innerText = `${percentage}%`;
+            progressBar.parentNode.style.display = (percentage == 100) ? 'none' : 'block';
+
+            console.log(percentage);
+
+
+        },
+    };
+
+    axios.patch(options).then(printResponse);
+    
+    //axios.patch(url, data, options).then(printResponse);
+
+   // axios.get(url).then(printResponse).then(populate);
+}
+
+const handleUploadChange = (e) => {
+    avatarInput.value = e.target.files[0].name;
+}
 
 formFind.addEventListener('submit', handleFindSubmit);
 formUser.addEventListener('submit', handleUserSubmit);
-
+uploadButton.addEventListener('change', handleUploadChange);
